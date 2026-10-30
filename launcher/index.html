@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920">
+<title>Home</title>
+<link rel="stylesheet" href="style.css">
+<script src="config.js"></script>
+<script src="$WEBAPIS/webapis/webapis.js"></script>
+</head>
+<body>
+<canvas class="glow" width="64" height="64"></canvas><canvas class="glow" width="64" height="64"></canvas>
+<div id="hero">
+  <img class="hero-art" alt=""><img class="hero-art" alt="">
+  <div id="hero-shade"></div>
+  <div id="hero-text">
+    <img id="hero-logo" alt="">
+    <div id="hero-title"></div>
+    <div id="hero-meta"></div>
+    <div id="hero-desc"></div>
+    <div id="hero-track"><div></div></div>
+  </div>
+</div>
+<div id="page">
+  <header id="top">
+    <div>
+      <div id="clock"></div>
+      <div id="hello"><span id="greeting"></span> · <span id="date"></span></div>
+    </div>
+    <nav>
+      <div class="pill" data-f data-act="inputs">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Inputs
+      </div>
+      <div class="pill" data-f data-act="settings">
+        <svg viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1"/></svg><span id="net">Network</span>
+      </div>
+      <div class="pill" data-f data-act="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings
+      </div>
+    </nav>
+  </header>
+  <section id="shelf"><div id="shelf-title"></div><div id="shelf-sub">Hold OK for options</div></section>
+  <section id="dock"></section>
+  <div id="couch-wrap"><h2>Continue in Couch TV</h2><section id="couch"></section></div>
+  <div id="sports-wrap"><h2>My Sports</h2><section id="sports"></section></div>
+  <h2 id="grid-title">All apps</h2>
+  <section id="grid"></section>
+  <div id="hidden-wrap"><h2>Hidden</h2><section id="hidden"></section></div>
+  <div id="hl"></div>
+</div>
+<div id="menu"></div>
+<div id="saver"><div id="saver-clock"></div></div>
+<div id="toast"></div>
+<div id="alert"><div id="alert-title"></div><div id="alert-sub">In My Sports below · OK on its tile to watch</div></div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="http://tv-shinnagans.local/home" version="1.0.0" viewmodes="maximized">
+    <tizen:application id="TVshnHome1.Home" package="TVshnHome1" required_version="6.0"/>
+    <content src="index.html"/>
+    <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
+    <feature name="http://tizen.org/feature/web.service"/>
+    <icon src="icon.png"/>
+    <name>Home</name>
+    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:privilege name="http://tizen.org/privilege/application.info"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.window"/>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <!-- Read by the Settings panel. -->
+    <tizen:privilege name="http://developer.samsung.com/privilege/productinfo"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/network.public"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/tvinfo"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/avinfo"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.audio"/>
+    <!-- The boot service's Continue channel, and Couch TV's artwork. -->
+    <access origin="http://127.0.0.1:8737" subdomains="false"/>
+    <access origin="https://image.tmdb.org" subdomains="false"/>
+    <tizen:profile name="tv-samsung"/>
+    <!-- "disable": the TV closes Home when another app opens, freeing ~70 MB (measured); Home saves its spot and reopens there. -->
+    <tizen:service id="TVshnHome1.Boot" auto-restart="true" on-boot="true">
+        <tizen:content src="service.js"/>
+        <tizen:name>Boot</tizen:name>
+    </tizen:service>
+    <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>

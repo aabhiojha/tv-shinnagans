@@ -1,0 +1,173 @@
+/* Tizen 6 (2021 sets) runs Chromium 76: no flex gap, inset, aspect-ratio or :is(). */
+@font-face { font-family: Outfit; src: url(fonts/outfit.ttf); font-weight: 100 900; }
+
+:root { --spring: cubic-bezier(.2, 1.15, .4, 1); --ease: cubic-bezier(.22, 1, .36, 1); }
+
+html { background: transparent; }
+body {
+  margin: 0; width: 1920px; height: 1080px; overflow: hidden;
+  background: var(--home-background, #000); color: #f5f5f7;
+  font-family: Outfit, sans-serif; font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+h2 { margin: 0; font-weight: 500; font-size: 34px; color: rgba(255,255,255,.75); }
+svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; margin-right: 14px; }
+
+/* Two 64px canvases stretched to full screen and crossfaded by opacity. Repainting any full-screen
+   layer costs ~1.3 s on this TV (measured); a 64px canvas repaints in no time and the GPU smooths it. */
+.glow {
+  position: fixed; left: 0; top: 0; width: 1920px; height: 1080px;
+  opacity: 0; transition: opacity .5s; will-change: opacity;
+}
+.glow.on { opacity: .45; }
+body.down .glow.on { opacity: .18; }
+
+#page { position: relative; transition: transform .3s var(--ease); will-change: transform; }
+
+#top { display: flex; justify-content: space-between; align-items: flex-start; padding: 64px 96px 0; }
+#clock { font-size: 112px; font-weight: 200; letter-spacing: -2px; line-height: 1; }
+#hello { margin-top: 14px; font-size: 30px; color: rgba(255,255,255,.6); }
+nav { display: flex; margin-top: 8px; }
+.pill {
+  display: flex; align-items: center; height: 64px; padding: 0 30px; margin-left: 20px;
+  border-radius: 32px; font-size: 26px; font-weight: 400;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+  transition: background .18s, color .18s, transform .24s var(--spring);
+}
+.pill.focused { background: #f5f5f7; color: #000; transform: scale(1.06); }
+
+#shelf { height: 200px; padding: 64px 96px 0; }
+#shelf-title { font-size: 92px; font-weight: 600; letter-spacing: -1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#shelf-sub { margin-top: 6px; font-size: 26px; color: rgba(255,255,255,.4); }
+
+#dock {
+  display: flex; justify-content: center; margin: 24px 64px 0; padding: 44px 24px 72px;
+  border-radius: 48px; background: rgba(255,255,255,.06); min-height: 170px;
+}
+#dock .tile { width: var(--dock-tile, 300px); height: var(--dock-tile-h, 170px); margin: 0 22px; flex-shrink: 0; }
+
+#grid-title { margin: 100px 96px 32px; }
+#grid, #hidden {
+  display: grid; grid-template-columns: repeat(var(--cols, 6), var(--tile, 240px)); grid-gap: 76px 44px;
+  justify-content: center; padding-bottom: 60px;
+}
+#grid .tile, #hidden .tile { width: var(--tile, 240px); height: var(--tile-h, 135px); }
+#hidden-wrap h2 { margin: 40px 96px 32px; }
+#hidden .tile { opacity: .45; }
+
+.tile {
+  position: relative; width: 240px; height: 135px; border-radius: 24px; background-color: #1c1c1e;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .24s var(--spring), opacity .18s;
+}
+.tile img { max-width: 64%; max-height: 64%; }
+.tile .initial { font-size: 56px; font-weight: 600; }
+.tile.cover img { max-width: none; max-height: none; width: 100%; height: 100%; object-fit: cover; border-radius: 24px; }
+.tile .track { position: absolute; left: 18px; right: 18px; bottom: 14px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.3); }
+.tile .track div { height: 100%; border-radius: 3px; background: #f5f5f7; }
+.tile .label {
+  position: absolute; left: -20px; right: -20px; top: 100%; margin-top: 18px;
+  text-align: center; font-size: 24px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; transition: opacity .2s;
+}
+.tile.focused { transform: scale(1.1); z-index: 2; }
+.tile.focused .label, #hidden .tile.focused { opacity: 1; }
+body.moving .tile:not(.focused) { opacity: .3; }
+body.moving .tile.focused { transform: scale(1.1) translateY(-14px); }
+
+/* Fixed size, the focused dock tile at 1.1x; grid tiles share its 16:9 shape, so JS only scales it.
+   Animating width/height relaid it out every frame: 220 ms frames, measured. */
+#hl {
+  position: absolute; left: 0; top: 0; width: 330px; height: 187px; z-index: 3; pointer-events: none;
+  box-sizing: border-box; transform-origin: 0 0; will-change: transform;
+  border-radius: 28px; border: 2px solid rgba(255,255,255,.6);
+  background: linear-gradient(150deg, rgba(255,255,255,.24), rgba(255,255,255,0) 55%);
+  box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  transition: transform .28s var(--spring), opacity .18s;
+}
+@media (prefers-reduced-motion: reduce) { *, *:before, *:after { transition: none !important; animation: none !important; } }
+
+#menu {
+  position: fixed; top: 0; right: 0; width: 620px; height: 1080px; box-sizing: border-box; padding: 90px 48px;
+  background: #18181a; box-shadow: -40px 0 80px rgba(0,0,0,.6); z-index: 10;
+  transform: translateX(100%); transition: transform .35s var(--ease);
+}
+#menu.open { transform: translateX(0); }
+#menu { overflow: hidden; }
+#menu h3 { margin: 30px 32px 10px; font-size: 22px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.45); }
+.item small { max-width: 58%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
+#menu h2 { margin-bottom: 36px; font-size: 40px; color: #f5f5f7; }
+.item {
+  display: flex; justify-content: space-between; align-items: center; height: 84px; padding: 0 32px; margin-bottom: 12px;
+  border-radius: 22px; font-size: 30px; font-weight: 400; transition: background .15s, color .15s;
+}
+.item small { font-size: 22px; opacity: .55; }
+.item.off { opacity: .35; }
+.item.focused { background: #f5f5f7; color: #000; }
+
+/* Settings fills the screen so the selected control and its explanation stay visible together. */
+#menu.settings { display: flex; width: 1920px; padding: 0; background: #10151c; box-shadow: none; }
+.settings-list { box-sizing: border-box; width: 1050px; height: 1080px; overflow-y: auto; padding: 80px 72px 100px 96px; scrollbar-width: none; }
+.settings-list::-webkit-scrollbar { display: none; }
+#menu.settings h2 { margin-bottom: 42px; font-size: 76px; font-weight: 500; letter-spacing: -2px; }
+#menu.settings h3 { margin: 44px 28px 16px; color: #95a9c2; }
+#menu.settings .item { height: 76px; margin-bottom: 8px; padding: 0 28px; border-radius: 16px; background: rgba(255,255,255,.045); font-size: 27px; }
+#menu.settings .item.focused { background: #d9e7ff; color: #111820; }
+#menu.settings .item small { max-width: 52%; font-size: 23px; opacity: .7; }
+.settings-detail { position: relative; box-sizing: border-box; flex: 1; padding: 100px 72px; background: radial-gradient(circle at 80% 10%, #293c55, #1a2533 55%, #18212d); border-left: 1px solid rgba(255,255,255,.08); }
+.settings-kicker { color: #a9c4e8; font-size: 22px; font-weight: 600; letter-spacing: 3px; }
+#menu.settings .settings-detail h2 { margin: 170px 0 28px; font-size: 54px; line-height: 1.1; }
+.settings-detail p { color: #c2cfdd; font-size: 31px; line-height: 1.4; }
+.settings-keys { position: absolute; bottom: 86px; left: 72px; right: 72px; color: #97aabf; font-size: 21px; line-height: 1.8; }
+.settings-keys span { padding: 0 10px; opacity: .45; }
+
+#saver { position: fixed; left: 0; top: 0; width: 1920px; height: 1080px; background: #000; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 1.2s; }
+#saver.on { opacity: 1; }
+#saver-clock { position: absolute; font-size: 170px; font-weight: 100; color: rgba(255,255,255,.75); transition: opacity 1s; }
+
+#toast {
+  position: fixed; left: 50%; bottom: 64px; transform: translateX(-50%); z-index: 30; padding: 20px 36px;
+  border-radius: 40px; background: rgba(44,44,46,.96); font-size: 26px; opacity: 0; transition: opacity .3s;
+}
+#toast.on { opacity: 1; }
+
+/* HDMI picture shown through the TV window: the video plane sits under the web layer. */
+body.away { display: none; }
+
+/* Couch TV row and hero. Everything here that changes or fades has its own layer (will-change):
+   repainting a big layer costs ~1.3 s on this TV (measured); compositing is free. */
+#couch-wrap h2 { margin: 64px 96px 28px; }
+#couch { display: flex; padding: 0 96px; }
+#couch .tile { margin-right: 44px; flex-shrink: 0; }
+#sports-wrap h2 { margin: 64px 96px 28px; }
+#sports { display: flex; padding: 0 96px; }
+#sports .tile { margin-right: 44px; flex-shrink: 0; }
+.tile .badge { position: absolute; left: 12px; top: 12px; padding: 5px 12px; border-radius: 10px; background: rgba(0,0,0,.8);
+  font-size: 20px; font-weight: 600; }
+.tile .badge.live { background: #e5352b; }
+/* A saved match about to start or just started (sports in app.js). */
+#alert { position: fixed; left: 50%; top: 40px; transform: translateX(-50%); z-index: 15; padding: 20px 40px 20px 64px;
+  border-radius: 40px; background: rgba(44,44,46,.97); opacity: 0; transition: opacity .3s; pointer-events: none; }
+#alert.on { opacity: 1; }
+#alert::before { content: ''; position: absolute; left: 30px; top: 31px; width: 16px; height: 16px; border-radius: 8px; background: #e5352b; }
+#alert-title { font-size: 30px; font-weight: 600; }
+#alert-sub { margin-top: 4px; font-size: 22px; color: rgba(255,255,255,.6); }
+#top, #shelf, #dock { transition: opacity .3s; will-change: opacity; }
+body.couch #top, body.couch #shelf, body.couch #dock { opacity: 0; }
+#hero { position: fixed; left: 0; top: 0; width: 1920px; height: 740px; opacity: 0; pointer-events: none;
+  transition: opacity .35s; will-change: opacity; }
+body.couch #hero { opacity: 1; }
+.hero-art { position: absolute; right: 0; top: 0; width: 1316px; height: 740px; object-fit: cover;
+  opacity: 0; transition: opacity .5s; will-change: opacity; }
+.hero-art.on { opacity: 1; }
+#hero-shade { position: absolute; left: 0; top: 0; width: 1920px; height: 740px; will-change: transform;
+  background: linear-gradient(90deg, var(--home-background, #000) 32%, transparent 72%),
+              linear-gradient(0deg, var(--home-background, #000), transparent 30%); }
+#hero-text { position: absolute; left: 96px; top: 190px; width: 780px; will-change: transform; }
+#hero-logo { display: block; max-width: 520px; max-height: 190px; }
+#hero-title { font-size: 76px; font-weight: 600; letter-spacing: -1px; line-height: 1.05; }
+#hero-meta { margin-top: 26px; font-size: 30px; font-weight: 400; color: rgba(255,255,255,.88); }
+#hero-desc { margin-top: 14px; font-size: 26px; line-height: 1.45; color: rgba(255,255,255,.62);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#hero-track { margin-top: 28px; width: 440px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.25); }
+#hero-track div { height: 100%; border-radius: 3px; background: #f5f5f7; }
