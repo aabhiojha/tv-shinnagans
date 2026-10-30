@@ -1,7 +1,7 @@
 # tv-shinnagans
 
 **A custom TV home screen, starting with Samsung Tizen.** Tizen is the only platform for now; Android TV /
-Google TV, webOS and others are planned. Contributions are welcome.
+Google TV and others are planned. Contributions are welcome.
 
 A clean home screen for a Samsung Tizen TV (built on a 2021 AU7700), after
 [CleanYourTV](https://github.com/Gathin23/cleanyourtv): a thin clock and greeting, a top shelf that names the
@@ -54,7 +54,6 @@ Certificate Manager.
 |---|---|
 | Samsung Tizen (tested on 2021 AU7700) | Works |
 | Android TV / Google TV | Planned |
-| LG webOS | Planned |
 
 Want another platform? Open an issue, or a PR that adds it in its own folder next to `launcher/`.
 
