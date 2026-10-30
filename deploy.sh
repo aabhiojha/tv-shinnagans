@@ -1,8 +1,8 @@
 #!/bin/sh
 # Package, sign, install and open the launcher on the TV.
-#   TV=192.168.1.33 PROFILE=couch ./deploy.sh
+#   TV=<TV IP> [PROFILE=<certificate profile>] ./deploy.sh
 set -e
-TV=${TV:-192.168.1.33}
+: "${TV:?set TV to the IP of the TV, for example TV=192.168.1.20 ./deploy.sh}"
 PROFILE=${PROFILE:-couch}
 APP=TVshnHome1.Home
 SDK=${TIZEN_SDK:-$HOME/tizen-studio}

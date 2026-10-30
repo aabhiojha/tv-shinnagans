@@ -22,16 +22,28 @@ Change the grid, background, glow, clock screensaver and sleep timer from the la
 
 ## Install
 
-TV: Developer Mode on (Apps, type `12345`), with this computer's IP as Host PC IP.
+It isn't in Samsung's app store: you install it with the TV's Developer Mode and your own free Samsung
+certificate. One-time setup:
+
+1. On a computer on the same network, install [Tizen Studio](https://developer.tizen.org/development/tizen-studio/download)
+   (the CLI is enough) and, in its Package Manager, **TV Extensions** and **Samsung Certificate Extension**.
+2. On the TV, open **Apps**, type `12345` on the remote, switch **Developer mode** On, set **Host PC IP** to this
+   computer's IP, and restart the TV.
+3. Connect: `~/tizen-studio/tools/sdb connect <TV IP>` (the TV's IP is under Settings → General → Network →
+   Network Status).
+4. In Tizen Studio's **Certificate Manager** (on Linux under Wayland, start it with `GDK_BACKEND=x11`), add a
+   **Samsung → TV** profile: a new author certificate, your Samsung account, and a distributor certificate with
+   privilege **Public**. With `sdb` connected the TV's DUID is filled in; check it is listed. Name it `couch`,
+   or pass `PROFILE=<name>` below.
+
+Then, and again after any change:
 
 ```sh
-./deploy.sh                      # TV=192.168.1.33 PROFILE=couch by default
-node check.mjs [screenshot-dir]  # headless-Chrome check of navigation, runs without the TV
+TV=<TV IP> ./deploy.sh              # package, sign, install and open it on the TV
+node check.mjs [screenshot-dir]     # headless-Chrome check of navigation, runs without the TV
 ```
 
-The signing profile's distributor certificate has to list the TV's DUID
-(`sdb -s <tv>:26101 shell 0 getduid`). If install fails with a certificate error, add it in Tizen Studio's
-Certificate Manager.
+If Developer Mode is turned off or the TV is reset, the app can disappear: run `./deploy.sh` again.
 
 ## What Tizen will not do
 
@@ -46,7 +58,6 @@ Certificate Manager.
   *Viewing Information Services*, and *Voice Recognition Services* if you don't use voice.
 - For ads in Samsung's own UI, an ad-blocking DNS on the router (Pi-hole, AdGuard Home or NextDNS) is the
   rest of the cleanup.
-- Developer apps can disappear if Developer Mode is turned off or the TV is reset; run `./deploy.sh` again.
 
 ## Platforms
 
