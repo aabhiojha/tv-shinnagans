@@ -67,6 +67,7 @@ try {
   await evalJs(`Object.defineProperty(document, 'hidden', { value: true, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); true`);
   await send('Page.reload'); await sleep(1200);
   assert.equal(await where(), 'dock:netflix', 'a restart resumes on the app that was focused');
+  await shot('home');
   await key('up'); assert.match(await where(), /Inputs|Wi-Fi|Settings/, 'up from the dock reaches the top buttons');
   await key('down'); await key('down');
   assert.match(await where(), /^couch:/, 'below the dock is the Couch TV row');
